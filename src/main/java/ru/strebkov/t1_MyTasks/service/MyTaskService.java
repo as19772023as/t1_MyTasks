@@ -1,6 +1,6 @@
 package ru.strebkov.t1_MyTasks.service;
 
-import ru.strebkov.t1_MyTasks.entity.MyTasksDto;
+import ru.strebkov.t1_MyTasks.dto.MyTasksDto;
 import ru.strebkov.t1_MyTasks.entity.MyTasksEntity;
 
 import java.util.List;

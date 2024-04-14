@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.strebkov.t1_MyTasks.entity.MyTasksDto;
+import ru.strebkov.t1_MyTasks.dto.MyTasksDto;
 import ru.strebkov.t1_MyTasks.entity.MyTasksEntity;
 import ru.strebkov.t1_MyTasks.service.MyTaskService;
 
@@ -22,52 +22,36 @@ public class MyTaskController {
 
     @GetMapping()
     public ResponseEntity<List<MyTasksDto>> getAllTasks() {
-        try {
-            List<MyTasksDto> listTasks = new ArrayList<MyTasksDto>(myTaskService.getAllTasks());
-            if (listTasks.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-            return new ResponseEntity<>(listTasks, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        List<MyTasksDto> listTasks = new ArrayList<MyTasksDto>(myTaskService.getAllTasks());
+        if (listTasks.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+        return new ResponseEntity<>(listTasks, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MyTasksDto> getTaskById(@PathVariable("id") Long id) {
-        Optional<MyTasksDto> taskById = myTaskService.getTaskById(id);
-        return taskById.map(myTasksDto -> new ResponseEntity<>(myTasksDto, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<Optional<MyTasksDto>> getTaskById(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(myTaskService.getTaskById(id), HttpStatus.OK);
+
     }
 
     @PostMapping()
-    public ResponseEntity<MyTasksEntity> saveMyTask(@RequestBody @Valid MyTasksDto myTasksDto) {
-        try {
-            MyTasksEntity myTasksEntity = myTaskService.saveMyTask(myTasksDto);
-            return new ResponseEntity<>(myTasksEntity, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<MyTasksEntity> saveMyTask(@Valid @RequestBody MyTasksDto myTasksDto) {
+        MyTasksEntity myTasksEntity = myTaskService.saveMyTask(myTasksDto);
+        return new ResponseEntity<>(myTasksEntity, HttpStatus.CREATED);
+
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MyTasksEntity> updateMyTask(@RequestBody @Valid MyTasksDto myTasksDto, @PathVariable("id") Long id) {
-        Optional<MyTasksDto> changeTask = myTaskService.getTaskById(id);
-        if (changeTask.isPresent()) {
-            return new ResponseEntity<>(myTaskService.updateMyTask(myTasksDto, id), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<MyTasksEntity> updateMyTask(@Valid @RequestBody MyTasksDto myTasksDto, @PathVariable("id") Long id) {
+        return new ResponseEntity<>(myTaskService.updateMyTask(myTasksDto, id), HttpStatus.OK);
+
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteMyTaskById(@PathVariable("id") Long id) {
-        try {
-            myTaskService.deleteMyTaskById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<String> deleteMyTaskById(@PathVariable("id") Long id) {
+        myTaskService.deleteMyTaskById(id);
+        return new ResponseEntity<String>("Задача удалена успешно!.", HttpStatus.OK);
     }
 
 }
